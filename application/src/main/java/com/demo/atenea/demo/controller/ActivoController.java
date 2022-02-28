@@ -6,12 +6,15 @@ import javax.validation.Valid;
 
 import com.demo.atenea.demo.dto.ActivoDTO;
 import com.demo.atenea.demo.dto.ActivoSearchCriteriaDTO;
+import com.demo.atenea.demo.dto.TransactionDTO;
 import com.demo.atenea.demo.service.ActivoService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,10 +81,17 @@ public class ActivoController {
      * @return
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivoDTO> save(@Valid @RequestBody ActivoDTO activo) {
+    public ResponseEntity<TransactionDTO> save(@Valid @RequestBody ActivoDTO activo, BindingResult validation) {
         log.info("POST request api/v1/activo : {}", activo);
-        ActivoDTO result = activoService.save(activo);
-        return result != null ? ResponseEntity.ok().body(result) : ResponseEntity.badRequest().build();
+        var result = new TransactionDTO();
+        try {
+            result = activoService.save(activo, validation);
+        } catch (Exception e) {
+            log.error("POST request api/v1/activo, error: {}", e);
+            return ResponseEntity.internalServerError().build();
+        }
+        return new ResponseEntity<TransactionDTO>(result,
+                result.getEstado() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -91,11 +101,16 @@ public class ActivoController {
      * @return
      */
     @PatchMapping(path = "/{activoId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivoDTO> patch(@PathVariable Long activoId, @RequestBody ActivoDTO activo) {
+    public ResponseEntity<TransactionDTO> patch(@PathVariable Long activoId, @RequestBody ActivoDTO activo) {
         log.info("PATCH request api/v1/activo : {}", activo);
-        return activoService.patch(activoId, activo)
-                .map(dto -> ResponseEntity.ok().body(dto))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        var result = new TransactionDTO();
+        try {
+            result = activoService.patch(activoId, activo);
+        } catch (Exception e) {
+            log.error("PATCH request api/v1/activo, error: {}", e);
+            return ResponseEntity.internalServerError().build();
+        }
+        return new ResponseEntity<TransactionDTO>(result,
+                result.getEstado() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
-
 }

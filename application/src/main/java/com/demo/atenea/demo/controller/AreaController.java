@@ -2,7 +2,6 @@ package com.demo.atenea.demo.controller;
 
 import java.util.List;
 
-import com.demo.atenea.demo.dto.AreaDTO;
 import com.demo.atenea.demo.dto.SelectorDTO;
 import com.demo.atenea.demo.service.AreaService;
 

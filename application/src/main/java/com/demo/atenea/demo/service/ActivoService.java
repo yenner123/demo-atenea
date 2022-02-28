@@ -11,12 +11,14 @@ import com.demo.atenea.demo.domain.Activo;
 import com.demo.atenea.demo.domain.TipoActivo;
 import com.demo.atenea.demo.dto.ActivoDTO;
 import com.demo.atenea.demo.dto.ActivoSearchCriteriaDTO;
+import com.demo.atenea.demo.dto.TransactionDTO;
 import com.demo.atenea.demo.mapper.ActivoMapper;
 import com.demo.atenea.demo.repository.ActivoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 @Service
 @Transactional
@@ -71,9 +73,24 @@ public class ActivoService {
      * 
      * @param activoDTO
      */
-    public ActivoDTO save(ActivoDTO activoDTO) {
-        Activo aspirante = ActivoMapper.toEntity(activoDTO);
-        return ActivoMapper.toDTO(repository.save(aspirante));
+    public TransactionDTO save(ActivoDTO activoDTO, BindingResult validation){
+        var result = new TransactionDTO();
+        // validation
+        if (validation.hasErrors()) {
+            result.setMensaje("Error en los datos enviados");
+            return result;
+        }
+        // mapper to entity
+        Activo newActivo = ActivoMapper.toEntity(activoDTO);
+        
+        // save
+        newActivo = repository.save(newActivo);
+
+        // success
+        result.setEstado(true);
+        result.setMensaje("Activo creado correctamente");
+        result.setData(ActivoMapper.toDTO(newActivo));
+        return result;
     }
 
     /**
@@ -81,14 +98,25 @@ public class ActivoService {
      * 
      * @param activoDTO
      */
-    public Optional<ActivoDTO> patch(Long id, ActivoDTO activoDTO) {
+    public TransactionDTO patch(Long id, ActivoDTO activoDTO) {
         return repository.findById(id)
                 .map(entity -> {
-                    entity.setSerial(activoDTO.getSerial());
-                    entity.setFechaBaja(activoDTO.getFechaBaja());
-                    return Optional.of(ActivoMapper.toDTO(entity));
+                    var result = new TransactionDTO();
+                    if (activoDTO.getFechaBaja() != null) {
+                        if (activoDTO.getFechaBaja().isAfter(entity.getFechaCompra())) {
+                            entity.setFechaBaja(activoDTO.getFechaBaja());
+                            entity.setSerial(activoDTO.getSerial());
+                            // result
+                            result.setEstado(true);
+                            result.setMensaje("Actualización exitosa");
+                            result.setData(ActivoMapper.toDTO(entity));
+                        } else {
+                            result.setMensaje("La fecha de baja no puede ser inferior a la fecha de compra");
+                        }
+                    }
+                    return result;
                 })
-                .orElseGet(() -> Optional.empty());
+                .orElseGet(() -> new TransactionDTO());
     }
 
     /**
