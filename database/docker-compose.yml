@@ -5,6 +5,8 @@ services:
     container_name: mysql-demo-atenea
     image: mysql:8.0.23
     command: mysqld --lower_case_table_names=1 --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./dump:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=atenea
@@ -12,5 +14,3 @@ services:
       - MYSQL_DATABASE=atenea-db
     ports:
       - 3306:3306
-volumes:
-  mysql-demo-atenea:
