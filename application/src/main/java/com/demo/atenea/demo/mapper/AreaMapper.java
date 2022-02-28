@@ -25,7 +25,10 @@ public class AreaMapper {
         }
 
         entity.setNombre(dto.getNombre());
-        entity.setCiudad(CiudadMapper.toEntity(dto.getCiudad()));
+        entity.setSigla(dto.getSigla());
+        if (dto.getCiudad() != null) {
+            entity.setCiudad(CiudadMapper.toEntity(dto.getCiudad()));
+        }
         return entity;
     }
 
@@ -33,7 +36,11 @@ public class AreaMapper {
         AreaDTO dto = new AreaDTO();
         dto.setId(entity.getId());
         dto.setNombre(entity.getNombre());
-        dto.setCiudad(CiudadMapper.toDTO(entity.getCiudad()));
+        dto.setSigla(entity.getSigla());
+
+        if (entity.getCiudad() != null) {
+            dto.setCiudad(CiudadMapper.toDTO(entity.getCiudad()));
+        }
         return dto;
     }
 }

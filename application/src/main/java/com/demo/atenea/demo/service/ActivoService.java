@@ -116,7 +116,7 @@ public class ActivoService {
                     }
                     return result;
                 })
-                .orElseGet(() -> new TransactionDTO());
+                .orElseGet(() -> new TransactionDTO("Activo no encontrado"));
     }
 
     /**

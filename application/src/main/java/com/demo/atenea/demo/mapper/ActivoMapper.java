@@ -35,6 +35,8 @@ public class ActivoMapper {
         entity.setFechaBaja(dto.getFechaBaja());
         entity.setLargo(dto.getLargo());
         entity.setNombre(dto.getNombre());
+        entity.setSerial(dto.getSerial());
+        entity.setValorCompra(dto.getValorCompra());
         entity.setNumInterno(dto.getNumInterno());
         entity.setAsignaArea(dto.getAsignaArea());
         entity.setEstadoActivo(EstadoActivoMapper.toEntity(dto.getEstado()));
@@ -55,13 +57,24 @@ public class ActivoMapper {
         dto.setFechaCompra(entity.getFechaCompra());
         dto.setFechaBaja(entity.getFechaBaja());
         dto.setLargo(entity.getLargo());
+        dto.setSerial(entity.getSerial());
         dto.setNombre(entity.getNombre());
         dto.setNumInterno(entity.getNumInterno());
+        dto.setValorCompra(entity.getValorCompra());
         dto.setAsignaArea(entity.getAsignaArea());
-        dto.setEstado(EstadoActivoMapper.toDTO(entity.getEstadoActivo()));
-        dto.setTipo(TipoActivoMapper.toDTO(entity.getTipoActivo()));
-        dto.setPersona(PersonaMapper.toDTO(entity.getPersona()));
-        dto.setArea(AreaMapper.toDTO(entity.getArea()));
+
+        if (entity.getEstadoActivo() != null) {
+            dto.setEstado(EstadoActivoMapper.toDTO(entity.getEstadoActivo()));
+        }
+        if (entity.getTipoActivo() != null) {
+            dto.setTipo(TipoActivoMapper.toDTO(entity.getTipoActivo()));
+        }
+        if (entity.getPersona() != null) {
+            dto.setPersona(PersonaMapper.toDTO(entity.getPersona()));
+        }
+        if (entity.getArea() != null) {
+            dto.setArea(AreaMapper.toDTO(entity.getArea()));
+        }
         return dto;
     }
 
